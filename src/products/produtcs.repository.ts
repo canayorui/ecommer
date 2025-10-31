@@ -58,7 +58,6 @@ export class ProductsRepository {
             description: element.description,
             price: element.price,
             stock: element.stock,
-            imgUrl: element.imgUrl,
             category: category,
           })
           .orUpdate(['description', 'price', 'stock', 'imgUrl'], ['name']) // Si existe, actualiza los campos especificados

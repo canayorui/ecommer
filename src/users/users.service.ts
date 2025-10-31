@@ -9,8 +9,8 @@ export class UsersService {
     return this.usersRepository.getUsers(page, limit);
   }
   //retorna un usuario por su id
-  getUser(id: string) {
-    return this.usersRepository.getUser(id);
+  getUserById(id: string) {
+    return this.usersRepository.getUserById(id);
   }
 
   addUser(user: any) {

@@ -2,9 +2,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
   ManyToMany,
   JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { Category } from 'src/entities/categories.entity';
 import { OrderDetails } from 'src/entities/ordersdetails.entity';
@@ -35,9 +35,9 @@ export class Product {
   })
   imgUrl!: string;
 
-  @OneToMany(() => Category, (category) => category.products)
+  @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn({ name: 'category_id' })
-  category!: Category[];
+  category!: Category;
 
   @ManyToMany(() => OrderDetails, (orderDetails) => orderDetails.products)
   orderDetails!: OrderDetails[];

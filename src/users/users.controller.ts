@@ -30,8 +30,8 @@ export class UsersController {
   @HttpCode(200)
   @Get(':id') // Get http://localhost:3000/users/:id
   @UseGuards(AuthGuard)
-  getUser(@Param('id') id: string) {
-    return this.usersService.getUser(id);
+  getUserById(@Param('id') id: string) {
+    return this.usersService.getUserById(id);
   }
   @HttpCode(201)
   @Post() // Post http://localhost:3000/users

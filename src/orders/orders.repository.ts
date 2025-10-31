@@ -32,7 +32,7 @@ export class OrdersRepository {
   ) {}
 
   //metodo para agregar una orden
-  async addOrder(userId: string, products: any) {
+  async addOrder(userId: string, products: { id: string }[]) {
     // verifica si el usuario existe
     const user = await this.usersRepository.findOneBy({ id: userId });
     if (!user) {
@@ -54,7 +54,7 @@ export class OrdersRepository {
         });
 
         if (!product) {
-          return `Producto con id: ${element.id} no encontrado`;
+          throw new Error(`Producto con id: ${element.id} no encontrado`);
         }
 
         //actualiza el stock del producto
