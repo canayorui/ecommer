@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ProductsRepository } from './produtcs.repository';
+import { CreateProductDto } from 'src/dto/product.dto';
 // respondera al PATH: /products
 
 @Injectable()
@@ -18,7 +19,7 @@ export class ProductsService {
     return this.productsRepository.addProduct();
   }
 
-  updateProduct(id: string, productNewData: any) {
+  updateProduct(id: string, productNewData: CreateProductDto) {
     return this.productsRepository.updateProduct(id, productNewData);
   }
 

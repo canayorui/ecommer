@@ -1,8 +1,9 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { Category } from '../entities/categories.entity';
 import { Repository } from 'typeorm';
-import * as data from '../utils/data.json';
+//import * as data from '../utils/data.json';
+import { CreateCategoryDto } from 'src/dto/category.dto';
 
 @Injectable()
 export class CategoriesRepository {
@@ -11,22 +12,25 @@ export class CategoriesRepository {
     private categoriesRepository: Repository<Category>,
   ) {}
 
+  // metodo para obtener todas las categorias
   async getCategories() {
     return await this.categoriesRepository.find();
   }
 
-  async addCategories() {
+  // este metodo crea un categoria
+  async addCategories(categoryDto: CreateCategoryDto) {
     //logica para agregar categorias
-    data.map(async (element) => {
-      await this.categoriesRepository
-        .createQueryBuilder() // createQuerybuilder crea el constructor de consultas
-        .insert() // insert => crea una consulta de inserción
-        .into(Category) //Especifica la tabla/entidad
-        .values({ name: element.category }) //valores a insertar
-        .orIgnore() // Si existe, lo ignora (no error)
-        .execute(); // Ejecuta la consulta
+    const existeCategory = await this.categoriesRepository.findOne({
+      where: { name: categoryDto.name },
     });
 
-    return 'categorias agregadas correctamente';
+    if (existeCategory) {
+      throw new ConflictException(`La categoria ${categoryDto.name} ya existe`);
+    }
+
+    const newCategory = await this.categoriesRepository.save({
+      name: categoryDto.name,
+    });
+    return newCategory;
   }
 }

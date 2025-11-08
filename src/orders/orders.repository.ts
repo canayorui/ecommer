@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Orders } from 'src/entities/orders.entity';
 import { OrderDetails } from 'src/entities/ordersdetails.entity';
@@ -32,11 +36,25 @@ export class OrdersRepository {
   ) {}
 
   //metodo para agregar una orden
-  async addOrder(userId: string, products: { id: string }[]) {
+  async addOrder(userId: string, products: Partial<Product>[]) {
     // verifica si el usuario existe
     const user = await this.usersRepository.findOneBy({ id: userId });
     if (!user) {
-      return `Usuario con id: ${userId} no encontrado`;
+      throw new NotFoundException(`Usuario con id: ${userId} no encontrado`);
+    }
+    // Validar que la orden no esté vacía
+    if (!products || products.length === 0) {
+      throw new BadRequestException(
+        'La orden debe contener al menos un producto',
+      );
+    }
+    // Validar productos duplicados
+    const productIds = products.map((p) => p.id).filter(Boolean);
+    const uniqueIds = new Set(productIds);
+    if (productIds.length !== uniqueIds.size) {
+      throw new BadRequestException(
+        'No se pueden agregar productos duplicados en la misma orden',
+      );
     }
 
     // crea una nueva orden
@@ -49,12 +67,17 @@ export class OrdersRepository {
     // asocia los id con los productos y la orden creada
     const productsArray = await Promise.all(
       products.map(async (element) => {
+        if (!element) {
+          throw new NotFoundException(`Elemento no válido en la orden`);
+        }
         const product = await this.productsRepository.findOneBy({
           id: element.id,
         });
 
         if (!product) {
-          throw new Error(`Producto con id: ${element.id} no encontrado`);
+          throw new NotFoundException(
+            `Producto con id: ${element.id} no encontrado`,
+          );
         }
 
         //actualiza el stock del producto
@@ -96,7 +119,7 @@ export class OrdersRepository {
       },
     });
     if (!order) {
-      return `Orden con id: ${id} no encontrada`;
+      throw new NotFoundException(`Orden con el id: ${id} no encontrada`);
     }
 
     return order;

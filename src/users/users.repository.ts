@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/users.entity';
 import { Repository } from 'typeorm';
+import { UpdateUserDto } from 'src/dto/user.dto';
 
 @Injectable()
 export class UsersRepository {
@@ -19,42 +20,51 @@ export class UsersRepository {
       take: limit,
       skip: skip,
     });
-
-    return users.map(({ password, ...userNoPassword }) => userNoPassword);
+    return users.map(({ password, ...userNoPassword }) => userNoPassword); // eslint-disable-line @typescript-eslint/no-unused-vars
   }
   //metodo para obtener un usuario por id sin la propiedad password
-  async getUserById(id: string): Promise<Omit<Users, 'password'> | string> {
+  async getUserById(id: string): Promise<Omit<Users, 'password'>> {
     const user = await this.usersRepository.findOne({
       where: { id },
       relations: {
         orders: true,
       },
     });
-    if (!user) return `no se mostro el usuario con id: ${id}`;
-    const { password, ...userNoPassword } = user;
+    if (!user) {
+      throw new NotFoundException(`Usuario con id: ${id} no encontrado`);
+    }
+
+    const { password, ...userNoPassword } = user; // eslint-disable-line @typescript-eslint/no-unused-vars
     return userNoPassword;
   }
 
   //metodo para agregar un usuario
   async addUser(user: Users): Promise<Omit<Users, 'password'>> {
     const newUser = await this.usersRepository.save(user);
-    const { password, ...userNoPassword } = newUser;
+    const { password, ...userNoPassword } = newUser; // eslint-disable-line @typescript-eslint/no-unused-vars
     return userNoPassword;
   }
   //este metodo crea un nuevo usuario.
-  async updateUser(id: string, user: Users): Promise<Omit<Users, 'password'>> {
+  async updateUser(
+    id: string,
+    user: UpdateUserDto,
+  ): Promise<Omit<Users, 'password'>> {
     await this.usersRepository.update(id, user);
     const updateUser = await this.usersRepository.findOneBy({ id });
-    if (!updateUser) throw new Error(`Usuario con id: ${id} no encontrado`);
-    const { password, ...userNoPassword } = updateUser;
+    if (!updateUser) {
+      throw new NotFoundException(`usuario ${id} no creado`);
+    }
+    const { password, ...userNoPassword } = updateUser; // eslint-disable-line @typescript-eslint/no-unused-vars
     return userNoPassword;
   }
   //este metodo elimina un usuario por id
   async deleteUser(id: string): Promise<Omit<Users, 'password'> | string> {
     const user = await this.usersRepository.findOneBy({ id });
-    if (!user) return `no se encontro el usuario con id: ${id}`;
+    if (!user) {
+      throw new NotFoundException(`no existe un usuario con id: ${id}`);
+    }
     await this.usersRepository.remove(user);
-    const { password, ...userNoPassword } = user;
+    const { password, ...userNoPassword } = user; // eslint-disable-line @typescript-eslint/no-unused-vars
     return userNoPassword;
   }
 

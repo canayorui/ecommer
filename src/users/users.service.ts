@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
+import { Users } from 'src/entities/users.entity';
+import { UpdateUserDto } from 'src/dto/user.dto';
 // respondera al PATH: /users
 @Injectable()
 export class UsersService {
@@ -13,11 +15,11 @@ export class UsersService {
     return this.usersRepository.getUserById(id);
   }
 
-  addUser(user: any) {
+  addUser(user: Users) {
     return this.usersRepository.addUser(user);
   }
 
-  updateUser(id: string, userNewData: any) {
+  updateUser(id: string, userNewData: UpdateUserDto) {
     return this.usersRepository.updateUser(id, userNewData);
   }
 

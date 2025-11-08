@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, ParseUUIDPipe } from '@nestjs/common';
 import {
   Body,
   Delete,
@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common/decorators';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/guards/auth.guards';
+import { CreateUserDto, UpdateUserDto } from 'src/dto/user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -30,32 +31,28 @@ export class UsersController {
   @HttpCode(200)
   @Get(':id') // Get http://localhost:3000/users/:id
   @UseGuards(AuthGuard)
-  getUserById(@Param('id') id: string) {
+  getUserById(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.getUserById(id);
   }
   @HttpCode(201)
   @Post() // Post http://localhost:3000/users
-  addUser(@Body() user: any) {
-    //validaciones basicas
-    if (!user.email) return 'El campo email es obligatorio';
-    if (!user.name) return 'El campo name es obligatorio';
-    if (!user.password) return 'El campo password es obligatorio';
+  addUser(@Body() user: CreateUserDto) {
     return this.usersService.addUser(user);
   }
   @HttpCode(200)
   @Put(':id') // Put http://localhost:3000/users/:id
   @UseGuards(AuthGuard)
-  updateUser(@Param('id') id: string, @Body() user: any) {
-    //validaciones
-    if (!user.email) return 'El campo email es obligatorio';
-    if (!user.name) return 'El campo name es obligatorio';
-    if (!user.password) return 'El campo password es obligatorio';
+  updateUser(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() user: UpdateUserDto,
+  ) {
     return this.usersService.updateUser(id, user);
   }
+
   @HttpCode(200)
   @Delete(':id') // Delete http://localhost:3000/users/:id
   @UseGuards(AuthGuard)
-  deleteUser(@Param('id') id: string) {
+  deleteUser(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.deleteUser(id);
   }
 }

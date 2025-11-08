@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'src/entities/categories.entity';
 import { Product } from '../entities/products.entity';
 import { Repository } from 'typeorm';
 import * as data from '../utils/data.json';
+import { CreateProductDto } from 'src/dto/product.dto';
 
 @Injectable()
 export class ProductsRepository {
@@ -32,7 +33,9 @@ export class ProductsRepository {
   async getProduct(id: string) {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      return `No se encontro el producto con el id: ${id}`;
+      throw new NotFoundException(
+        `No se encontro el producto con el id: ${id}`,
+      );
     }
     return product;
   }
@@ -46,7 +49,9 @@ export class ProductsRepository {
           (Category) => Category.name === element.category,
         );
         if (!category) {
-          throw new Error(`Categoria ${element.category} no encontrada`);
+          throw new NotFoundException(
+            `Categoria ${element.category} no encontrada`,
+          );
         }
         // crea un nuevo producto
         await this.productsRepository
@@ -68,12 +73,14 @@ export class ProductsRepository {
   }
 
   //este metodo crea un nuevo producto.
-  async updateProduct(id: string, productNewData: any) {
+  async updateProduct(id: string, productNewData: CreateProductDto) {
     await this.productsRepository.update(id, productNewData);
     // verifica si el producto existe
     const updatedProduct = await this.productsRepository.findOneBy({ id });
     // si no se encuentra el producto, retorna un mensaje
-    if (!updatedProduct) return `no se encontro el producto con el id: ${id}`;
+    if (!updatedProduct) {
+      throw new NotFoundException(`producto con id: ${id} no encontrado`);
+    }
     // Object.assign actualiza el producto con los nuevos datos
     Object.assign(updatedProduct, productNewData);
     // retorna el id del producto actualizado
@@ -85,7 +92,9 @@ export class ProductsRepository {
     // busca el producto por id
     const product = await this.productsRepository.findOne({ where: { id } });
     // si no se encuentra el producto, retorna un mensaje
-    if (!product) return `no se encontro el producto con id: ${id}`;
+    if (!product) {
+      throw new NotFoundException(`producto con id: ${id} no encontrado`);
+    }
     // elimina el producto de la base de datos
     await this.productsRepository.remove(product);
     // retorna el id del producto eliminado

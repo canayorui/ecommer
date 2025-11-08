@@ -15,4 +15,7 @@ async function bootstrap() {
   console.log(`el servidor esta escuchando en  http://${HOST}:${PORT}`);
 }
 //aqui va llamar a la funcion bootstrap
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('Error al iniciar la aplicación:', error);
+  process.exit(1);
+});

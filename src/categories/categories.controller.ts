@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
+import { CreateCategoryDto } from 'src/dto/category.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -7,8 +8,8 @@ export class CategoriesController {
 
   //logica para agregar categorias
   @Get('seeder')
-  addCategories() {
-    return this.categoriesService.addCategories();
+  addCategories(categoryDto: CreateCategoryDto) {
+    return this.categoriesService.addCategories(categoryDto);
   }
 
   //retorna todas las categorias
