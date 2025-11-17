@@ -15,6 +15,7 @@ import { CreateProductDto } from 'src/dto/product.dto';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  //Get http://localhost:3000/products?page=1&limit=5
   @Get()
   getProducts(@Query('page') page?: string, @Query('limit') limit?: string) {
     if (page && limit) {
@@ -23,16 +24,19 @@ export class ProductsController {
     return this.productsService.getProducts(1, 5);
   }
 
-  @Get(':id')
-  getProductById(@Param('id', ParseUUIDPipe) id: string) {
-    return this.productsService.getProductById(id);
-  }
-
+  // Seed products http://localhost:3000/products/seeder
   @Get('seeder')
   addProduct() {
     return this.productsService.addProduct();
   }
 
+  // Get http://localhost:3000/products/:id
+  @Get(':id')
+  getProductById(@Param('id', ParseUUIDPipe) id: string) {
+    return this.productsService.getProductById(id);
+  }
+
+  // Put http://localhost:3000/products/:id
   @Put(':id')
   updateProduct(
     @Param('id', ParseUUIDPipe) id: string,
@@ -41,6 +45,7 @@ export class ProductsController {
     return this.productsService.updateProduct(id, product);
   }
 
+  // Delete http://localhost:3000/products/:id
   @Delete(':id')
   deleteProduct(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.deleteProduct(id);

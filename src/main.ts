@@ -7,7 +7,11 @@ async function bootstrap() {
   // Crear una instancia de la aplicacion NestJS
   const app = await NestFactory.create(AppModule);
   // Habilitar el uso de pipes globales
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
   // Escuchar en el puerto 3000 o el definido en las variables de entorno
   const PORT = Number(process.env.PORT) || 3000;
   const HOST = process.env.HOST || 'localhost';

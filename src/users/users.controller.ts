@@ -19,7 +19,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   //definicion de los endpoints
   @HttpCode(200)
-  @Get() //Get => http://localhost:3000/users
+  @Get() //Get => http://localhost:3000/users?page=1&limit=5
   @UseGuards(AuthGuard)
   getUsers(@Query('page') page?: string, @Query('limit') limit?: string) {
     const pageNum = Number(page);

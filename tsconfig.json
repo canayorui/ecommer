@@ -13,6 +13,7 @@
     "removeComments": true,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "types": ["multer"]
   }
 }

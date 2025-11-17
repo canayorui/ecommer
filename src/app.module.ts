@@ -9,6 +9,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { typeOrmConfig } from './config/typeorm';
 import { CategoriesModule } from './categories/categories.module';
 import { OrdersModule } from './orders/orders.module';
+import {
+  NestModule,
+  MiddlewareConsumer,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
+import { LoggerMiddleware } from './middleware/logger.middleware';
+import { CategoriesService } from './categories/categories.service';
+import { ProductsService } from './products/products.service';
+import { FileUploadModule } from './file-upload/file-upload.module';
 
 //importar la configuracion de typeorm
 @Module({
@@ -27,15 +36,26 @@ import { OrdersModule } from './orders/orders.module';
     AuthModule,
     CategoriesModule,
     OrdersModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  //export class AppModule  implements NestModule{}
-  //  configure(consumer: MiddlewareConsumer) {
-  //    consumer
-  //      .apply(LoggerMiddleware)
-  //      .forRoutes(UsersController);
-  //  }
+export class AppModule implements NestModule, OnApplicationBootstrap {
+  constructor(
+    private readonly categoriesService: CategoriesService,
+    private readonly productsService: ProductsService,
+  ) {}
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+
+  async onApplicationBootstrap() {
+    await this.categoriesService.addCategories();
+    console.log('categories cargadas correctamente...');
+
+    await this.productsService.addProduct();
+    console.log('productos cargadas correctamente...');
+  }
 }

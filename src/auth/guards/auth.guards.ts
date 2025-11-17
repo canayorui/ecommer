@@ -15,7 +15,7 @@ export class AuthGuard implements CanActivate {
     try {
       const request = context.switchToHttp().getRequest<Request>();
       return this.validateRequest(request);
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid authentication');
     }
   }
@@ -44,7 +44,7 @@ export class AuthGuard implements CanActivate {
       // Aquí deberías validar contra tu base de datos
       // Por ahora solo validamos el formato
       return this.validateCredentials(email, password);
-    } catch (error) {
+    } catch {
       return false;
     }
   }
