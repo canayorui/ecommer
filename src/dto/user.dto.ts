@@ -7,8 +7,10 @@ import {
   IsStrongPassword,
   MaxLength,
   MinLength,
+  Validate,
 } from 'class-validator';
 import { Orders } from '../entities/orders.entity';
+import { MatchPassword } from 'decorators/matchPassword.decorators';
 
 // DTO para crear usuario
 export class CreateUserDto {
@@ -85,6 +87,10 @@ export class UpdateUserDto {
   @MinLength(8)
   @MaxLength(15)
   password?: string;
+
+  @IsNotEmpty({ message: 'la confirmación de la contraseña es requerida' })
+  @Validate(MatchPassword, ['password'])
+  confirmPassword!: string;
 
   @IsOptional()
   @IsNumber()

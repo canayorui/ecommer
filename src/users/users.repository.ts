@@ -39,9 +39,10 @@ export class UsersRepository {
   }
 
   //metodo para agregar un usuario
-  async addUser(user: Users): Promise<Omit<Users, 'password'>> {
+  async addUser(user: Partial<Users>): Promise<Omit<Users, 'password'>> {
     const newUser = await this.usersRepository.save(user);
-    const { password, ...userNoPassword } = newUser; // eslint-disable-line @typescript-eslint/no-unused-vars
+    const dbUser = await this.usersRepository.findOneBy({ id: newUser.id });
+    const { password, ...userNoPassword } = dbUser!; // eslint-disable-line @typescript-eslint/no-unused-vars
     return userNoPassword;
   }
   //este metodo crea un nuevo usuario.
@@ -69,6 +70,7 @@ export class UsersRepository {
   }
 
   async getUserByEmail(email: string): Promise<Users | null> {
-    return await this.usersRepository.findOneBy({ email });
+    const foundUser = await this.usersRepository.findOneBy({ email });
+    return foundUser;
   }
 }

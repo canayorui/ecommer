@@ -7,9 +7,11 @@ import {
   Query,
   Body,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from 'src/dto/product.dto';
+import { AuthGuard } from 'src/auth/guards/auth.guards';
 
 @Controller('products')
 export class ProductsController {
@@ -38,6 +40,7 @@ export class ProductsController {
 
   // Put http://localhost:3000/products/:id
   @Put(':id')
+  @UseGuards(AuthGuard)
   updateProduct(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() product: CreateProductDto,

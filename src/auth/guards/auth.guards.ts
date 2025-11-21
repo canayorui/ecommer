@@ -5,54 +5,40 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { Request } from 'express';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  constructor(private readonly jwtService: JwtService) {}
+
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    try {
-      const request = context.switchToHttp().getRequest<Request>();
-      return this.validateRequest(request);
-    } catch {
-      throw new UnauthorizedException('Invalid authentication');
-    }
-  }
+    const request = context.switchToHttp().getRequest();
 
-  private validateRequest(request: Request): boolean {
     const authHeader = request.headers.authorization;
-
-    if (!authHeader || typeof authHeader !== 'string') {
-      return false;
+    if (!authHeader) {
+      throw new UnauthorizedException(
+        'No se proporcionó token de autorización',
+      );
     }
 
-    const parts = authHeader.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Basic') {
-      return false;
+    const [type, token] = authHeader.split(' ');
+    if (type !== 'Bearer' || !token) {
+      throw new UnauthorizedException('Token inválido');
     }
 
     try {
-      // Decodificar Base64
-      const decoded = Buffer.from(parts[1], 'base64').toString();
-      const [email, password] = decoded.split(':');
-
-      if (!email || !password) {
-        return false;
-      }
-
-      // Aquí deberías validar contra tu base de datos
-      // Por ahora solo validamos el formato
-      return this.validateCredentials(email, password);
-    } catch {
-      return false;
+      const payload = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      request.user = payload;
+      return true;
+    } catch (error: unknown) {
+      typeof error === 'object' &&
+        error !== null &&
+        'name' in error &&
+        (error as any).name === 'TokenExpiredError';
     }
-  }
-
-  private validateCredentials(email: string, password: string): boolean {
-    // TODO: Implementar validación real contra base de datos
-    // Por ahora solo validamos formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email) && password.length > 0;
   }
 }

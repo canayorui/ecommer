@@ -27,6 +27,7 @@ const config = {
   synchronize: true,
   logging: true,
   dropSchema: false,
+  JWT_SECRET: process.env.JWT_SECRET,
 };
 
 export const typeOrmConfig = registerAs('typeorm', () => config);
