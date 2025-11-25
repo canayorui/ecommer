@@ -34,6 +34,9 @@ export class Users {
 
   @Column({ type: 'varchar', length: 50 })
   city!: string;
+  
+  @Column({ default: false })
+  isAdmin!: boolean;
   //una relacion uno a muchos con orders
   @OneToMany(() => Orders, (order) => order.user)
   @JoinColumn({ name: 'order_id' })

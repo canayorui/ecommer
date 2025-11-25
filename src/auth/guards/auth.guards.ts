@@ -5,7 +5,24 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { Request } from 'express';
+
+interface User {
+  id: string;
+  roles: string[];
+}
+
+interface JwtPayload {
+  id: string;
+  isAdmin: boolean;
+  exp: number;
+  roles: string[];
+}
+
+interface CustomRequest extends Request {
+  user?: User;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -14,7 +31,7 @@ export class AuthGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<CustomRequest>();
 
     const authHeader = request.headers.authorization;
     if (!authHeader) {
@@ -25,20 +42,24 @@ export class AuthGuard implements CanActivate {
 
     const [type, token] = authHeader.split(' ');
     if (type !== 'Bearer' || !token) {
-      throw new UnauthorizedException('Token inválido');
+      throw new UnauthorizedException('no se a enviado el token invalido');
     }
 
     try {
-      const payload = this.jwtService.verify(token, {
+      const payload: JwtPayload = this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET,
       });
+      console.log(payload);
+
+      payload.roles = payload.isAdmin ? ['admin'] : ['Role.user'];
+
       request.user = payload;
       return true;
-    } catch (error: unknown) {
-      typeof error === 'object' &&
-        error !== null &&
-        'name' in error &&
-        (error as any).name === 'TokenExpiredError';
+    } catch (error) {
+      if (error instanceof TokenExpiredError)
+        throw new UnauthorizedException('error al validar token');
     }
+
+    return false;
   }
 }

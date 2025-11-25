@@ -6,8 +6,8 @@ export class CategoriesService {
   constructor(private readonly categoriesRepository: CategoriesRepository) {}
 
   //logica para agregar categorias
-  addCategories() {
-    return this.categoriesRepository.addCategories();
+  addCategories(data: { category: string }[]) {
+    return this.categoriesRepository.addCategories(data);
   }
 
   //retorna todas las categorias

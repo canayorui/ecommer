@@ -58,10 +58,11 @@ export class AppModule implements NestModule, OnApplicationBootstrap {
   }
 
   async onApplicationBootstrap() {
-    await this.categoriesService.addCategories();
-    console.log('categories cargadas correctamente...');
+    const categoriesData = [{ category: 'Electronics' }, { category: 'Books' }];
+    await this.categoriesService.addCategories(categoriesData);
+    console.log('categorías cargadas correctamente...');
 
     await this.productsService.addProduct();
-    console.log('productos cargadas correctamente...');
+    console.log('productos cargados correctamente...');
   }
 }

@@ -1,5 +1,6 @@
 import {
   IsEmail,
+  IsEmpty,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -10,7 +11,8 @@ import {
   Validate,
 } from 'class-validator';
 import { Orders } from '../entities/orders.entity';
-import { MatchPassword } from 'decorators/matchPassword.decorators';
+import { MatchPassword } from 'src/decorators/matchPassword.decorators';
+import { Column } from 'typeorm';
 
 // DTO para crear usuario
 export class CreateUserDto {
@@ -113,6 +115,9 @@ export class UpdateUserDto {
   @MinLength(5)
   @MaxLength(20)
   city?: string;
+
+  @IsEmpty()
+  isAdmin!: boolean;
 }
 
 export class LoginUserDto {

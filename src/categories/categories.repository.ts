@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { Category } from '../entities/categories.entity';
 import { Repository } from 'typeorm';
-import * as data from '../utils/data.json';
+//import * as data from '../utils/data.json';
 
 @Injectable()
 export class CategoriesRepository {
@@ -15,7 +15,10 @@ export class CategoriesRepository {
     return await this.categoriesRepository.find();
   }
 
-  async addCategories(): Promise<string> {
+  async addCategories(data: { category: string }[]): Promise<string> {
+    if (!Array.isArray(data)) {
+      throw new Error('data debe ser un array');
+    }
     const insertPromises = data.map(
       (element) =>
         this.categoriesRepository
@@ -28,7 +31,7 @@ export class CategoriesRepository {
     );
 
     await Promise.all(insertPromises);
-    return 'categorias agregadas correctamente';
+    return 'categorías agregadas correctamente';
   }
 }
 

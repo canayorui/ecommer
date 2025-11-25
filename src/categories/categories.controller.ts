@@ -8,7 +8,8 @@ export class CategoriesController {
   //logica para agregar categorias(get http://localhost:3000/categories/seeder)
   @Get('seeder')
   addCategories() {
-    return this.categoriesService.addCategories();
+    const data = [{ category: 'Nueva Categoria' }]; // Ejemplo de datos
+    return this.categoriesService.addCategories(data);
   }
 
   //retorna todas las categorias(get http://localhost:3000/categories)

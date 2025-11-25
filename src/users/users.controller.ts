@@ -12,6 +12,9 @@ import {
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/guards/auth.guards';
 import { UpdateUserDto } from 'src/dto/user.dto';
+import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
+import { Role } from 'src/auth/enums/roles.enum';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -19,7 +22,8 @@ export class UsersController {
   //definicion de los endpoints
   @HttpCode(200)
   @Get() //Get => http://localhost:3000/users?page=1&limit=5
-  @UseGuards(AuthGuard)
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   getUsers(@Query('page') page?: string, @Query('limit') limit?: string) {
     const pageNum = Number(page);
     const limitNum = Number(limit);
