@@ -15,12 +15,15 @@ import { UpdateUserDto } from 'src/dto/user.dto';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { Role } from 'src/auth/enums/roles.enum';
 import { Roles } from 'src/decorators/roles.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('mis usuarios')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   //definicion de los endpoints
   @HttpCode(200)
+  @ApiBearerAuth()
   @Get() //Get => http://localhost:3000/users?page=1&limit=5
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
@@ -32,6 +35,7 @@ export class UsersController {
     return this.usersService.getUsers(validPage, validLimit);
   }
   @HttpCode(200)
+  @ApiBearerAuth()
   @Get(':id') // Get http://localhost:3000/users/:id
   @UseGuards(AuthGuard)
   getUserById(@Param('id', ParseUUIDPipe) id: string) {
@@ -43,6 +47,7 @@ export class UsersController {
   //   return this.usersService.addUser(user);
   // }
   @HttpCode(200)
+  @ApiBearerAuth()
   @Put(':id') // Put http://localhost:3000/users/:id
   @UseGuards(AuthGuard)
   updateUser(
@@ -53,6 +58,7 @@ export class UsersController {
   }
 
   @HttpCode(200)
+  @ApiBearerAuth()
   @Delete(':id') // Delete http://localhost:3000/users/:id
   @UseGuards(AuthGuard)
   deleteUser(@Param('id', ParseUUIDPipe) id: string) {

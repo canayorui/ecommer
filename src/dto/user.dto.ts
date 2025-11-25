@@ -12,24 +12,39 @@ import {
 } from 'class-validator';
 import { Orders } from '../entities/orders.entity';
 import { MatchPassword } from 'src/decorators/matchPassword.decorators';
-import { Column } from 'typeorm';
+import { ApiHideProperty } from '@nestjs/swagger';
 
-// DTO para crear usuario
 export class CreateUserDto {
+  @ApiHideProperty()
   id!: string;
+
+  @ApiHideProperty()
   orders!: Orders[];
 
+  /***
+   * Debe ser un string de entre 3 a 8 caracteres
+   * @example 'Juan Perez'
+   */
   @IsNotEmpty({ message: 'el nombre es requerido' })
   @IsString()
   @MinLength(3)
   @MaxLength(80)
   name!: string;
 
+  /***
+   * Debe ser un email valido
+   * @example 'test12@example.com'
+   */
   @IsNotEmpty({ message: 'el email es requerido' })
   @IsString()
   @IsEmail()
   email!: string;
 
+  /***
+   * Debe ser un string de entre 8 a 15 caracteres, debe contener una minuscula,una mayuscula
+   * un numero y un simbolo(!@#$%^&*
+   * @example 'Abb12pollo@'
+   */
   @IsNotEmpty({ message: 'la contraseña es requerida' })
   @IsString()
   @MinLength(8)
@@ -48,25 +63,45 @@ export class CreateUserDto {
   )
   password!: string;
 
+  /***
+   * debe ser un numero
+   * @example '123455'
+   */
   @IsNotEmpty({ message: 'el número de teléfono es requerido' })
   @IsNumber()
   phone!: number;
 
+  /***
+   * Debe ser un string de entre 5 a 20 caracteres
+   * @example 'Demo Contry'
+   */
   @IsNotEmpty({ message: 'el país es requerido' })
   @IsString()
   @MinLength(5)
   @MaxLength(20)
   country!: string;
 
+  /***
+   * Debe ser un string de entre 3 a 80 caracteres
+   * @example 'Demo Street 123'
+   */
   @IsString()
   @MinLength(3)
   @MaxLength(80)
   address!: string;
 
+  /***
+   * Debe ser un string de entre 5 a 20 caracteres
+   * @example 'Demo Cyti'
+   */
   @IsString()
   @MinLength(5)
   @MaxLength(20)
   city!: string;
+
+  @ApiHideProperty()
+  @IsEmpty()
+  isAdmin!: boolean;
 }
 
 // DTO para actualizar usuario

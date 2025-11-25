@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { OrderDetails } from 'src/entities/ordersdetails.entity';
 import { Users } from 'src/entities/users.entity';
 import {
@@ -13,9 +14,11 @@ import {
   name: 'orders',
 })
 export class Orders {
+  @ApiProperty({ description: 'uuid v4 generada por la base de datos' })
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @ApiProperty({ description: 'fecha y hora en que se realizó la orden' })
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',

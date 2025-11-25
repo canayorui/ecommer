@@ -17,8 +17,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('API Ecommerce CanayoRui')
     .setDescription('API para la gestion de un ecommerce')
-    .setVersion('1.0')
-    .addTag('ecommerce')
+    .setVersion('1.0.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory());
