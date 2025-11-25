@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'src/entities/categories.entity';
 import { Product } from '../entities/products.entity';
 import { Repository } from 'typeorm';
-//import * as data from '../utils/data.json';
+import * as data from '../utils/data.json';
+import { CreateProductDto } from 'src/dto/product.dto';
 
 @Injectable()
 export class ProductsRepository {
@@ -28,20 +29,24 @@ export class ProductsRepository {
     return products;
   }
 
-  //metodo para obtener un producto por id
+  // Método para obtener un producto por id
   async getProduct(id: string) {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
       throw new NotFoundException(
-        `No se encontro el producto con el id: ${id}`,
+        `No se encontró el producto con el id: ${id}`,
       );
     }
     return product;
   }
 
-  //metodo para agregar un producto
+  // Método para agregar un producto
   async addProduct() {
     const categories = await this.categoriesRepository.find();
+
+    if (!Array.isArray(data)) {
+      throw new Error('data debe ser un array');
+    }
     await Promise.all(
       data.map(async (element) => {
         const category = categories.find(
@@ -49,14 +54,14 @@ export class ProductsRepository {
         );
         if (!category) {
           throw new NotFoundException(
-            `Categoria ${element.category} no encontrada`,
+            `Categoría ${element.category} no encontrada`,
           );
         }
-        // crea un nuevo producto
+        // Crea un nuevo producto
         await this.productsRepository
-          .createQueryBuilder() // createQuerybuilder crea el constructor de consultas
+          .createQueryBuilder() // createQueryBuilder crea el constructor de consultas
           .insert() // insert => crea una consulta de inserción
-          .into(Product) //Especifica la tabla/entidad
+          .into(Product) // Especifica la tabla/entidad
           .values({
             name: element.name,
             description: element.description,
@@ -68,35 +73,35 @@ export class ProductsRepository {
           .execute(); // Ejecuta la consulta
       }),
     );
-    return 'productos agregados correctamente';
+    return 'Productos agregados correctamente';
   }
 
-  //este metodo crea un nuevo producto.
+  // Este método crea un nuevo producto.
   async updateProduct(id: string, productNewData: CreateProductDto) {
     await this.productsRepository.update(id, productNewData);
-    // verifica si el producto existe
+    // Verifica si el producto existe
     const updatedProduct = await this.productsRepository.findOneBy({ id });
-    // si no se encuentra el producto, retorna un mensaje
+    // Si no se encuentra el producto, retorna un mensaje
     if (!updatedProduct) {
-      throw new NotFoundException(`producto con id: ${id} no encontrado`);
+      throw new NotFoundException(`Producto con id: ${id} no encontrado`);
     }
     // Object.assign actualiza el producto con los nuevos datos
     Object.assign(updatedProduct, productNewData);
-    // retorna el id del producto actualizado
+    // Retorna el id del producto actualizado
     return id;
   }
 
-  //este metodo elimina un producto por id
+  // Este método elimina un producto por id
   async deleteProduct(id: string): Promise<string> {
-    // busca el producto por id
+    // Busca el producto por id
     const product = await this.productsRepository.findOne({ where: { id } });
-    // si no se encuentra el producto, retorna un mensaje
+    // Si no se encuentra el producto, retorna un mensaje
     if (!product) {
-      throw new NotFoundException(`producto con id: ${id} no encontrado`);
+      throw new NotFoundException(`Producto con id: ${id} no encontrado`);
     }
-    // elimina el producto de la base de datos
+    // Elimina el producto de la base de datos
     await this.productsRepository.remove(product);
-    // retorna el id del producto eliminado
+    // Retorna el id del producto eliminado
     return id;
   }
 }
