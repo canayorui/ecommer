@@ -3,8 +3,8 @@ import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { ProductsRepository } from './produtcs.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Product } from '../entities/products.entity';
-import { Category } from 'src/entities/categories.entity';
+import { Product } from 'src/products/entities/product.entity';
+import { Category } from 'src/categories/entities/category.entity';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({

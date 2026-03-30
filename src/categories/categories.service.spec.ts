@@ -1,12 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoriesService } from './categories.service';
+import { CategoriesRepository } from './categories.repository';
 
 describe('CategoriesService', () => {
   let service: CategoriesService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [CategoriesService],
+      providers: [
+        CategoriesService,
+        {
+          provide: CategoriesRepository,
+          useValue: {
+            getCategories: jest.fn(),
+            addCategories: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     service = module.get<CategoriesService>(CategoriesService);

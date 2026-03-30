@@ -12,7 +12,7 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from 'src/dto/product.dto';
+import { CreateProductDto } from 'src/products/dto/product.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guards';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';

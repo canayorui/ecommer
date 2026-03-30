@@ -6,8 +6,8 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
-import { Category } from 'src/entities/categories.entity';
-import { OrderDetails } from 'src/entities/ordersdetails.entity';
+import { Category } from 'src/categories/entities/category.entity';
+import { OrderDetails } from 'src/orders/entities/order-detail.entity';
 
 @Entity({
   name: 'products',

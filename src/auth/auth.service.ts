@@ -3,11 +3,11 @@ import {
   BadRequestException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Users } from 'src/entities/users.entity';
+import { Users } from 'src/users/entities/user.entity';
 import { UsersRepository } from 'src/users/users.repository';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from 'src/dto/user.dto';
+import { CreateUserDto } from 'src/users/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -34,7 +34,7 @@ export class AuthService {
     const payload = {
       id: foundUser.id,
       email: foundUser.email,
-      isAdmin: foundUser.isAdmin,
+      roles: foundUser.roles,
     };
 
     const token = this.jwtService.sign(payload);

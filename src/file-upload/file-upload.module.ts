@@ -4,7 +4,7 @@ import { FileUploadController } from './file-upload.controller';
 import { CloudinaryConfig } from 'src/config/cloudinary';
 import { FileUploadRepository } from './file-upload.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Product } from 'src/entities/products.entity';
+import { Product } from 'src/products/entities/product.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Product])],

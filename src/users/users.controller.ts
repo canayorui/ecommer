@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common/decorators';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/guards/auth.guards';
-import { UpdateUserAdminDto, UpdateUserDto } from 'src/dto/user.dto';
+import { UpdateUserDto, UpdateUserRolesDto } from 'src/users/dto/user.dto';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { Role } from 'src/auth/enums/roles.enum';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -65,13 +65,13 @@ export class UsersController {
 
   @HttpCode(200)
   @ApiBearerAuth()
-  @Patch(':id/admin')
+  @Patch(':id/roles')
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
-  updateAdminStatus(
+  updateUserRoles(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() payload: UpdateUserAdminDto,
+    @Body() payload: UpdateUserRolesDto,
   ) {
-    return this.usersService.setAdminStatus(id, payload.isAdmin);
+    return this.usersService.updateRoles(id, payload.roles);
   }
 }

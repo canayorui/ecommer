@@ -17,7 +17,7 @@ interface AuthenticatedUser {
 
 interface JwtPayload {
   id: string;
-  isAdmin: boolean;
+  roles: Role[];
   exp: number;
 }
 
@@ -47,7 +47,7 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET,
       });
 
-      const roles = payload.isAdmin ? [Role.Admin] : [Role.User];
+      const roles = payload.roles ?? [Role.User];
 
       request.user = {
         id: payload.id,

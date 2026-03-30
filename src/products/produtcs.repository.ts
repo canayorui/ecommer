@@ -4,10 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Category } from 'src/entities/categories.entity';
-import { Product } from '../entities/products.entity';
+import { Category } from 'src/categories/entities/category.entity';
+import { Product } from 'src/products/entities/product.entity';
 import { In, MoreThan, Repository } from 'typeorm';
-import { CreateProductDto } from 'src/dto/product.dto';
+import { CreateProductDto } from 'src/products/dto/product.dto';
 import productSeedData from '../utils/data.json';
 
 type SeedProduct = {

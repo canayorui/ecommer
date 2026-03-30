@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ProductsRepository } from './produtcs.repository';
-import { CreateProductDto } from 'src/dto/product.dto';
+import { CreateProductDto } from 'src/products/dto/product.dto';
 // respondera al PATH: /products
 
 @Injectable()

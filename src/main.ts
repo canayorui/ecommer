@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 // Bootstrap  inicia la aplicacion
 async function bootstrap() {
@@ -14,10 +16,17 @@ async function bootstrap() {
     }),
   );
 
+  // Registrar filtro global de excepciones
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Registrar interceptor global de transformación de respuestas
+  app.useGlobalInterceptors(new TransformInterceptor());
+
   const config = new DocumentBuilder()
     .setTitle('API Ecommerce CanayoRui')
     .setDescription('API para la gestion de un ecommerce')
     .setVersion('1.0.0')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory());

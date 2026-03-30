@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { Category } from '../entities/categories.entity';
+import { Category } from 'src/categories/entities/category.entity';
 import { Repository } from 'typeorm';
 //import * as data from '../utils/data.json';
 
@@ -42,7 +42,7 @@ export class CategoriesRepository {
 
 // import { InjectRepository } from '@nestjs/typeorm';
 // import { ConflictException, Injectable } from '@nestjs/common';
-// import { Category } from '../entities/categories.entity';
+// import { Category } from 'src/categories/entities/category.entity';
 // import { Repository } from 'typeorm';
 // //import * as data from '../utils/data.json';
 // import { CreateCategoryDto } from 'src/dto/category.dto';

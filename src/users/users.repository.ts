@@ -4,12 +4,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from 'src/entities/users.entity';
+import { Users } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
-import { UpdateUserDto } from 'src/dto/user.dto';
+import { UpdateUserDto } from 'src/users/dto/user.dto';
+import { Role } from 'src/auth/enums/roles.enum';
 import * as bcrypt from 'bcrypt';
 
-type SanitizedUser = Omit<Users, 'password' | 'isAdmin' | 'orders'>;
+type SanitizedUser = Omit<Users, 'password' | 'orders'>;
 type OrderSummary = { id: string; date: Date };
 
 @Injectable()
@@ -21,7 +22,6 @@ export class UsersRepository {
   private sanitizeUser(user: Users): SanitizedUser {
     const safeUser = { ...user } as Partial<Users>;
     delete safeUser.password;
-    delete safeUser.isAdmin;
     delete safeUser.orders;
     return safeUser as SanitizedUser;
   }
@@ -74,7 +74,7 @@ export class UsersRepository {
     const dbUser = await this.usersRepository.findOneBy({ id: newUser.id });
     return this.sanitizeUser(dbUser!);
   }
-  //este metodo crea un nuevo usuario.
+  //este metodo actualiza los datos de un usuario.
   async updateUser(id: string, user: UpdateUserDto): Promise<SanitizedUser> {
     const userFromDb = await this.usersRepository.findOneBy({ id });
     if (!userFromDb) {
@@ -91,7 +91,7 @@ export class UsersRepository {
     }
 
     Object.entries(payload).forEach(([key, value]) => {
-      if (value !== undefined && key !== 'password' && key !== 'isAdmin') {
+      if (value !== undefined && key !== 'password' && key !== 'roles') {
         const mutableUser = userFromDb as unknown as Record<string, unknown>;
         mutableUser[key] = value;
       }
@@ -110,13 +110,13 @@ export class UsersRepository {
     return this.sanitizeUser(user);
   }
 
-  async setAdminStatus(id: string, isAdmin: boolean): Promise<SanitizedUser> {
+  async updateRoles(id: string, roles: Role[]): Promise<SanitizedUser> {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`usuario con id: ${id} no encontrado`);
     }
 
-    user.isAdmin = isAdmin;
+    user.roles = roles;
     const savedUser = await this.usersRepository.save(user);
     return this.sanitizeUser(savedUser);
   }
@@ -126,3 +126,4 @@ export class UsersRepository {
     return foundUser;
   }
 }
+
