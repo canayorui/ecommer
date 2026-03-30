@@ -20,6 +20,6 @@
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["multer"]
+    "types": ["multer", "node", "express", "jest"]
   }
 }

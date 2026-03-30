@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEmail,
   IsEmpty,
   IsNotEmpty,
@@ -9,6 +10,7 @@ import {
   MaxLength,
   MinLength,
   Validate,
+  ValidateIf,
 } from 'class-validator';
 import { Orders } from '../entities/orders.entity';
 import { MatchPassword } from 'src/decorators/matchPassword.decorators';
@@ -62,6 +64,14 @@ export class CreateUserDto {
     },
   )
   password!: string;
+
+  /***
+   * Debe confirmar la contraseña principal
+   */
+  @IsNotEmpty({ message: 'la confirmación de la contraseña es requerida' })
+  @IsString()
+  @Validate(MatchPassword, ['password'])
+  confirmPassword!: string;
 
   /***
    * debe ser un numero
@@ -123,11 +133,24 @@ export class UpdateUserDto {
   @IsString()
   @MinLength(8)
   @MaxLength(15)
+  @IsStrongPassword(
+    {
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1,
+    },
+    {
+      message:
+        'la contraseña debe tener al menos una letra mayúscula, una letra minúscula, un número y uno de los caracteres especiales: !@#$%^&*',
+    },
+  )
   password?: string;
 
+  @ValidateIf((user: UpdateUserDto) => user.password !== undefined)
   @IsNotEmpty({ message: 'la confirmación de la contraseña es requerida' })
   @Validate(MatchPassword, ['password'])
-  confirmPassword!: string;
+  confirmPassword?: string;
 
   @IsOptional()
   @IsNumber()
@@ -178,4 +201,10 @@ export class LoginUserDto {
     },
   )
   password!: string;
+}
+
+export class UpdateUserAdminDto {
+  @IsNotEmpty({ message: 'el estado isAdmin es requerido' })
+  @IsBoolean({ message: 'isAdmin debe ser un valor booleano' })
+  isAdmin!: boolean;
 }

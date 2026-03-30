@@ -4,15 +4,10 @@ import {
   MaxLength,
   MinLength,
   IsNumber,
+  IsOptional,
 } from 'class-validator';
-import { Category } from 'src/entities/categories.entity';
-import { OrderDetails } from 'src/entities/ordersdetails.entity';
 
 export class CreateProductDto {
-  id!: string;
-  category!: Category;
-  orderDetails!: OrderDetails[];
-
   /***
    * Debe ser un string de entre 3 a 50 caracteres
    * @example 'MAUSE'
@@ -48,4 +43,12 @@ export class CreateProductDto {
   @IsNotEmpty({ message: ' el stock del producto es requerido' })
   @IsNumber()
   stock!: number;
+
+  /***
+   * Debe ser una url opcional
+   * @example 'https://example.com/product.png'
+   */
+  @IsOptional()
+  @IsString()
+  imgUrl?: string;
 }

@@ -49,6 +49,10 @@ export class OrdersRepository {
       );
     }
     // Validar productos duplicados
+    if (products.some((product) => !product?.id)) {
+      throw new BadRequestException('Cada producto debe incluir un id válido');
+    }
+
     const productIds = products.map((p) => p.id).filter(Boolean);
     const uniqueIds = new Set(productIds);
     if (productIds.length !== uniqueIds.size) {
@@ -70,8 +74,9 @@ export class OrdersRepository {
         if (!element) {
           throw new NotFoundException(`Elemento no válido en la orden`);
         }
+        const productId = element.id as string;
         const product = await this.productsRepository.findOneBy({
-          id: element.id,
+          id: productId,
         });
 
         if (!product) {
@@ -80,9 +85,15 @@ export class OrdersRepository {
           );
         }
 
+        if (product.stock <= 0) {
+          throw new BadRequestException(
+            `El producto ${product.name} no tiene stock disponible`,
+          );
+        }
+
         //actualiza el stock del producto
         await this.productsRepository.update(
-          { id: element.id },
+          { id: productId },
           { stock: product.stock - 1 },
         );
         return product;
@@ -104,7 +115,10 @@ export class OrdersRepository {
     return await this.ordersRepository.findOne({
       where: { id: newOrder.id },
       relations: {
-        orderDetails: true,
+        user: true,
+        orderDetails: {
+          products: true,
+        },
       },
     });
   }
@@ -116,6 +130,7 @@ export class OrdersRepository {
         orderDetails: {
           products: true,
         },
+        user: true,
       },
     });
     if (!order) {

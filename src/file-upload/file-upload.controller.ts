@@ -9,20 +9,24 @@ import {
   ParseFilePipe,
   InternalServerErrorException,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileUploadService } from './file-upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/auth/guards/auth.guards';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-@Controller('file')
+@ApiTags('files')
+@Controller('files')
 export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 
-  @Post('uploadImage/:id')
+  @Post('uploadImage/:productId')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
-    @Param('id') productId: string,
+    @Param('productId', new ParseUUIDPipe()) productId: string,
     @UploadedFile(
       new ParseFilePipe({
         validators: [

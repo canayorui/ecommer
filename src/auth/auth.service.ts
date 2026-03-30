@@ -7,6 +7,7 @@ import { Users } from 'src/entities/users.entity';
 import { UsersRepository } from 'src/users/users.repository';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { CreateUserDto } from 'src/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,18 +20,17 @@ export class AuthService {
   }
 
   async signIn(email: string, password: string) {
-    // if (!email || !password) {
-    //   throw new BadRequestException('email y password son requeridos');
-    // }
+    if (!email || !password) {
+      throw new BadRequestException('email y password son requeridos');
+    }
     const foundUser = await this.usersRepository.getUserByEmail(email);
-    if (!foundUser) {
-      throw new UnauthorizedException('Usuario no encontrado');
+    const validPassword =
+      foundUser && (await bcrypt.compare(password, foundUser.password));
+
+    if (!validPassword) {
+      throw new UnauthorizedException('Email o password incorrectos');
     }
 
-    const validPassword = await bcrypt.compare(password, foundUser.password);
-    if (!validPassword) {
-      throw new UnauthorizedException('Email y password incorrectos');
-    }
     const payload = {
       id: foundUser.id,
       email: foundUser.email,
@@ -44,10 +44,14 @@ export class AuthService {
     };
   }
 
-  async signUp(user: Partial<Users>) {
-    const { email, password } = user;
+  async signUp(user: CreateUserDto) {
+    const { email, password, confirmPassword, ...rest } = user;
     if (!email || !password) {
       throw new BadRequestException(' email y password  son necesarios');
+    }
+
+    if (password !== confirmPassword) {
+      throw new BadRequestException('Las contraseñas no coinciden');
     }
 
     const foundUser = await this.usersRepository.getUserByEmail(email);
@@ -61,10 +65,13 @@ export class AuthService {
 
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
-      return await this.usersRepository.addUser({
-        ...user,
+      const created = await this.usersRepository.addUser({
+        ...rest,
+        email,
         password: hashedPassword,
       });
+      const safeUser: Partial<Users> = created;
+      return safeUser;
     } catch (error) {
       console.error('Error al hashear la contraseña:', error);
       throw new BadRequestException('Error al crear el usuario');

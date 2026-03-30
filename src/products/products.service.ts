@@ -15,12 +15,24 @@ export class ProductsService {
     return this.productsRepository.getProduct(id);
   }
 
+  createProduct(categoryId: string, createProductDto: CreateProductDto) {
+    return this.productsRepository.createProduct(categoryId, createProductDto);
+  }
+
   addProduct() {
     return this.productsRepository.addProduct();
   }
 
-  updateProduct(id: string, productNewData: CreateProductDto) {
-    return this.productsRepository.updateProduct(id, productNewData);
+  updateProduct(
+    id: string,
+    categoryId: string,
+    productNewData: CreateProductDto,
+  ) {
+    return this.productsRepository.updateProduct(
+      id,
+      categoryId,
+      productNewData,
+    );
   }
 
   deleteProduct(id: string) {

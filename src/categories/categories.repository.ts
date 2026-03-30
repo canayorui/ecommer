@@ -15,22 +15,27 @@ export class CategoriesRepository {
     return await this.categoriesRepository.find();
   }
 
-  async addCategories(data: { category: string }[]): Promise<string> {
-    if (!Array.isArray(data)) {
-      throw new Error('data debe ser un array');
+  async addCategories(data: { name: string }[]): Promise<string> {
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error('data debe ser un array con al menos un elemento');
     }
-    const insertPromises = data.map(
-      (element) =>
-        this.categoriesRepository
-          .createQueryBuilder() // createQuerybuilder crea el constructor de consultas
-          .insert() // insert => crea una consulta de inserción
-          .into(Category) //Especifica la tabla/entidad
-          .values({ name: element.category }) //valores a insertar
-          .orIgnore() // Si existe, lo ignora (no error)
-          .execute(), // Ejecuta la consulta
-    );
 
-    await Promise.all(insertPromises);
+    const normalizedNames = data
+      .map((element) => element?.name?.trim())
+      .filter((name): name is string => Boolean(name));
+
+    if (normalizedNames.length === 0) {
+      throw new Error('No se recibieron nombres de categorías válidos');
+    }
+
+    await this.categoriesRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Category)
+      .values(normalizedNames.map((name) => ({ name })))
+      .orIgnore()
+      .execute();
+
     return 'categorías agregadas correctamente';
   }
 }

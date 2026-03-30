@@ -4,33 +4,30 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { TokenExpiredError } from 'jsonwebtoken';
+import { Role } from 'src/auth/enums/roles.enum';
 
-interface User {
+interface AuthenticatedUser {
   id: string;
-  roles: string[];
+  roles: Role[];
+  expiresAt: number;
 }
 
 interface JwtPayload {
   id: string;
   isAdmin: boolean;
   exp: number;
-  roles: string[];
 }
 
-interface CustomRequest extends Request {
-  user?: User;
-}
+type CustomRequest = Request & { user?: AuthenticatedUser };
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<CustomRequest>();
 
     const authHeader = request.headers.authorization;
@@ -46,20 +43,26 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const payload: JwtPayload = this.jwtService.verify(token, {
+      const payload = this.jwtService.verify<JwtPayload>(token, {
         secret: process.env.JWT_SECRET,
       });
-      console.log(payload);
 
-      payload.roles = payload.isAdmin ? ['admin'] : ['Role.user'];
+      const roles = payload.isAdmin ? [Role.Admin] : [Role.User];
 
-      request.user = payload;
+      request.user = {
+        id: payload.id,
+        roles,
+        expiresAt: payload.exp,
+      };
+
       return true;
     } catch (error) {
-      if (error instanceof TokenExpiredError)
-        throw new UnauthorizedException('error al validar token');
+      if (error instanceof TokenExpiredError) {
+        throw new UnauthorizedException(
+          'El token expiró, vuelve a iniciar sesión',
+        );
+      }
+      throw new UnauthorizedException('Token de autenticación inválido');
     }
-
-    return false;
   }
 }

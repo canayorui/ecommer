@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'src/entities/categories.entity';
 import { Product } from '../entities/products.entity';
-import { In, Repository } from 'typeorm';
+import { In, MoreThan, Repository } from 'typeorm';
 import { CreateProductDto } from 'src/dto/product.dto';
 import productSeedData from '../utils/data.json';
 
@@ -26,27 +30,65 @@ export class ProductsRepository {
 
   //metodo para obtener todos los productos con paginacion
   async getProducts(page: number, limit: number): Promise<Product[]> {
-    let products = await this.productsRepository.find({
+    return this.productsRepository.find({
       relations: {
         category: true,
       },
+      where: {
+        stock: MoreThan(0),
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: {
+        name: 'ASC',
+      },
     });
-
-    const start = (page - 1) * limit;
-    const end = start + limit;
-    products = products.slice(start, end);
-    return products;
   }
 
   //metodo para obtener un producto por id
   async getProduct(id: string) {
-    const product = await this.productsRepository.findOne({ where: { id } });
+    const product = await this.productsRepository.findOne({
+      where: { id },
+      relations: { category: true },
+    });
     if (!product) {
       throw new NotFoundException(
         `No se encontro el producto con el id: ${id}`,
       );
     }
     return product;
+  }
+
+  async createProduct(
+    categoryId: string,
+    createProductDto: CreateProductDto,
+  ): Promise<string> {
+    const category = await this.categoriesRepository.findOneBy({
+      id: categoryId,
+    });
+    if (!category) {
+      throw new NotFoundException(
+        `Categoria con id: ${categoryId} no encontrada`,
+      );
+    }
+
+    const existingProduct = await this.productsRepository.findOne({
+      where: { name: createProductDto.name },
+    });
+
+    if (existingProduct) {
+      throw new BadRequestException(
+        `Ya existe un producto con el nombre: ${createProductDto.name}`,
+      );
+    }
+
+    const newProduct = this.productsRepository.create({
+      ...createProductDto,
+      category,
+    });
+
+    const savedProduct = await this.productsRepository.save(newProduct);
+    return savedProduct.id;
   }
 
   //metodo para agregar un producto
@@ -119,18 +161,43 @@ export class ProductsRepository {
   }
 
   //este metodo crea un nuevo producto.
-  async updateProduct(id: string, productNewData: CreateProductDto) {
-    await this.productsRepository.update(id, productNewData);
-    // verifica si el producto existe
-    const updatedProduct = await this.productsRepository.findOneBy({ id });
-    // si no se encuentra el producto, retorna un mensaje
-    if (!updatedProduct) {
+  async updateProduct(
+    id: string,
+    categoryId: string,
+    productNewData: CreateProductDto,
+  ) {
+    const product = await this.productsRepository.findOne({
+      where: { id },
+      relations: { category: true },
+    });
+
+    if (!product) {
       throw new NotFoundException(`producto con id: ${id} no encontrado`);
     }
-    // Object.assign actualiza el producto con los nuevos datos
-    Object.assign(updatedProduct, productNewData);
-    // retorna el id del producto actualizado
-    return id;
+
+    const category = await this.categoriesRepository.findOneBy({
+      id: categoryId,
+    });
+    if (!category) {
+      throw new NotFoundException(
+        `Categoria con id: ${categoryId} no encontrada`,
+      );
+    }
+
+    if (productNewData.name && productNewData.name !== product.name) {
+      const duplicatedName = await this.productsRepository.findOne({
+        where: { name: productNewData.name },
+      });
+      if (duplicatedName && duplicatedName.id !== id) {
+        throw new BadRequestException(
+          `Ya existe un producto con el nombre: ${productNewData.name}`,
+        );
+      }
+    }
+
+    Object.assign(product, productNewData, { category });
+    await this.productsRepository.save(product);
+    return product.id;
   }
 
   //este metodo elimina un producto por id
@@ -144,6 +211,6 @@ export class ProductsRepository {
     // elimina el producto de la base de datos
     await this.productsRepository.remove(product);
 
-    return `producto con id: ${id} eliminado correctamente`;
+    return id;
   }
 }
