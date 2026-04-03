@@ -10,7 +10,7 @@ import {
 export class CreateProductDto {
   /***
    * Debe ser un string de entre 3 a 50 caracteres
-   * @example 'MAUSE'
+   * @example 'MOUSE'
    */
   @IsNotEmpty({ message: ' el nombre del producto es requerido' })
   @IsString()

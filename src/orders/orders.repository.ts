@@ -4,10 +4,10 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Orders } from 'src/entities/orders.entity';
-import { OrderDetails } from 'src/entities/ordersdetails.entity';
-import { Product } from 'src/entities/products.entity';
-import { Users } from 'src/entities/users.entity';
+import { Orders } from 'src/orders/entities/order.entity';
+import { OrderDetails } from 'src/orders/entities/order-detail.entity';
+import { Product } from 'src/products/entities/product.entity';
+import { Users } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()

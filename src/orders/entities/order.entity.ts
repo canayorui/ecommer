@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { OrderDetails } from 'src/entities/ordersdetails.entity';
-import { Users } from 'src/entities/users.entity';
+import { OrderDetails } from 'src/orders/entities/order-detail.entity';
+import { Users } from 'src/users/entities/user.entity';
 import {
   Column,
   Entity,
@@ -28,7 +28,6 @@ export class Orders {
   @OneToOne(() => OrderDetails, (orderDetails) => orderDetails.order)
   orderDetails!: OrderDetails;
 
-  // Relación muchas órdenes pertenecen a un usuario
   @ManyToOne(() => Users, (user) => user.orders)
   @JoinColumn({ name: 'user_id' })
   user!: Users;

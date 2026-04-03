@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Orders } from 'src/entities/orders.entity';
+import { Role } from 'src/auth/enums/roles.enum';
+import { Orders } from 'src/orders/entities/order.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -44,10 +45,10 @@ export class Users {
   @Column({ type: 'varchar', length: 50 })
   city!: string;
 
-  @ApiProperty({ description: 'indica si el usuario es administrador' })
-  @Column({ default: false })
-  isAdmin!: boolean;
-  //una relacion uno a muchos con orders
+  @ApiProperty({ description: 'roles del usuario', enum: Role, isArray: true })
+  @Column({ type: 'simple-array', default: Role.User })
+  roles!: Role[];
+
   @OneToMany(() => Orders, (order) => order.user)
   @JoinColumn({ name: 'order_id' })
   orders!: Orders[];

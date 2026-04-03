@@ -1,7 +1,8 @@
 import {
-  IsBoolean,
+  IsArray,
   IsEmail,
   IsEmpty,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -12,9 +13,10 @@ import {
   Validate,
   ValidateIf,
 } from 'class-validator';
-import { Orders } from '../entities/orders.entity';
+import { Orders } from 'src/orders/entities/order.entity';
 import { MatchPassword } from 'src/decorators/matchPassword.decorators';
 import { ApiHideProperty } from '@nestjs/swagger';
+import { Role } from 'src/auth/enums/roles.enum';
 
 export class CreateUserDto {
   @ApiHideProperty()
@@ -24,7 +26,7 @@ export class CreateUserDto {
   orders!: Orders[];
 
   /***
-   * Debe ser un string de entre 3 a 8 caracteres
+   * Debe ser un string de entre 3 a 80 caracteres
    * @example 'Juan Perez'
    */
   @IsNotEmpty({ message: 'el nombre es requerido' })
@@ -83,7 +85,7 @@ export class CreateUserDto {
 
   /***
    * Debe ser un string de entre 5 a 20 caracteres
-   * @example 'Demo Contry'
+   * @example 'Demo Country'
    */
   @IsNotEmpty({ message: 'el país es requerido' })
   @IsString()
@@ -102,7 +104,7 @@ export class CreateUserDto {
 
   /***
    * Debe ser un string de entre 5 a 20 caracteres
-   * @example 'Demo Cyti'
+   * @example 'Demo City'
    */
   @IsString()
   @MinLength(5)
@@ -111,10 +113,9 @@ export class CreateUserDto {
 
   @ApiHideProperty()
   @IsEmpty()
-  isAdmin!: boolean;
+  roles!: Role[];
 }
 
-// DTO para actualizar usuario
 export class UpdateUserDto {
   id!: string;
   orders!: Orders[];
@@ -175,7 +176,7 @@ export class UpdateUserDto {
   city?: string;
 
   @IsEmpty()
-  isAdmin!: boolean;
+  roles!: Role[];
 }
 
 export class LoginUserDto {
@@ -203,8 +204,13 @@ export class LoginUserDto {
   password!: string;
 }
 
-export class UpdateUserAdminDto {
-  @IsNotEmpty({ message: 'el estado isAdmin es requerido' })
-  @IsBoolean({ message: 'isAdmin debe ser un valor booleano' })
-  isAdmin!: boolean;
+export class UpdateUserRolesDto {
+  /***
+   * Array de roles a asignar al usuario
+   * @example ["admin", "catalog_manager"]
+   */
+  @IsNotEmpty({ message: 'se requiere al menos un rol' })
+  @IsArray({ message: 'roles debe ser un array' })
+  @IsEnum(Role, { each: true, message: 'cada rol debe ser un valor válido' })
+  roles!: Role[];
 }

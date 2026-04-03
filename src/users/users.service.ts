@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
-import { Users } from 'src/entities/users.entity';
-import { CreateUserDto, UpdateUserDto } from 'src/dto/user.dto';
+import { Users } from 'src/users/entities/user.entity';
+import { CreateUserDto, UpdateUserDto } from 'src/users/dto/user.dto';
+import { Role } from 'src/auth/enums/roles.enum';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +32,7 @@ export class UsersService {
     return this.usersRepository.deleteUser(id);
   }
 
-  setAdminStatus(id: string, isAdmin: boolean) {
-    return this.usersRepository.setAdminStatus(id, isAdmin);
+  updateRoles(id: string, roles: Role[]) {
+    return this.usersRepository.updateRoles(id, roles);
   }
 }

@@ -9,7 +9,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from 'src/dto/order.dto';
+import { CreateOrderDto } from 'src/orders/dto/order.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guards';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
